@@ -6,7 +6,7 @@ export default function BibleReader() {
     const [books, setBooks] = useState<any[]>([]);
     const [versions, setVersions] = useState<any[]>([]);
     const [selectedBook, setSelectedBook] = useState<number>(1);
-    const [selectedChapter, setSelectedChapter] = useState<number>(1);
+    const [selectedChapter, setSelectedChapter] = useState<number | string>(1);
     const [selectedVersion, setSelectedVersion] = useState<number>(1);
     const [loading, setLoading] = useState(true);
     const [isImporting, setIsImporting] = useState(false);
@@ -69,12 +69,12 @@ export default function BibleReader() {
     }, [isImporting]); // Reload versions if an import finishes
 
     useEffect(() => {
-        if (!selectedBook || !selectedVersion) return;
+        if (!selectedBook || !selectedVersion || selectedChapter === '') return;
 
         async function loadVerses() {
             setLoading(true);
             try {
-                const data = await getVersiculos(selectedVersion, selectedBook, selectedChapter);
+                const data = await getVersiculos(selectedVersion, selectedBook, Number(selectedChapter));
                 setVerses(data);
             } catch (err) {
                 console.error('Error loading verses:', err);
@@ -178,11 +178,6 @@ export default function BibleReader() {
             }
         }
 
-        // Restore panel scroll
-        const panel = panelRef.current;
-        if (panel) {
-            panel.style.overflowY = '';
-        }
     }, []);
 
     // Register and clean up global listeners (capture phase!)
@@ -204,12 +199,6 @@ export default function BibleReader() {
 
         const target = e.currentTarget;
         const rect = target.getBoundingClientRect();
-
-        // Immediately freeze the panel scroll so the browser cannot start a scroll gesture
-        const panel = panelRef.current;
-        if (panel) {
-            panel.style.overflowY = 'hidden';
-        }
 
         dragState.current = {
             active: true,
@@ -346,25 +335,48 @@ export default function BibleReader() {
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-1 sm:space-x-4 text-slate-400">
+                <div className="flex items-center space-x-1 sm:space-x-3 text-slate-400">
                     <button
-                        onClick={() => setSelectedChapter(Math.max(1, selectedChapter - 1))}
+                        onClick={() => setSelectedChapter(Math.max(1, Number(selectedChapter) - 1))}
                         className="p-1 hover:text-slate-800 transition-colors"
-                        disabled={selectedChapter <= 1}
+                        disabled={Number(selectedChapter) <= 1}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                     </button>
 
-                    <select
-                        className="bg-transparent outline-none cursor-pointer text-sm font-semibold hover:text-slate-800 transition-colors appearance-none ml-2 border-b border-transparent hover:border-slate-300"
-                        value={selectedBook}
-                        onChange={e => { setSelectedBook(Number(e.target.value)); setSelectedChapter(1); }}
-                    >
-                        {books.map(b => <option key={b.id} value={b.id}>{b.nome}</option>)}
-                    </select>
+                    <div className="flex items-center space-x-1">
+                        <select
+                            className="bg-transparent outline-none cursor-pointer text-sm font-semibold hover:text-slate-800 transition-colors appearance-none border-b border-transparent hover:border-slate-300"
+                            value={selectedBook}
+                            onChange={e => { setSelectedBook(Number(e.target.value)); setSelectedChapter(1); }}
+                        >
+                            {books.map(b => <option key={b.id} value={b.id}>{b.nome}</option>)}
+                        </select>
+                        <input
+                            type="number"
+                            min={1}
+                            value={selectedChapter}
+                            onChange={e => {
+                                const val = parseInt(e.target.value);
+                                if (!isNaN(val) && val >= 1) {
+                                    setSelectedChapter(val);
+                                } else if (e.target.value === '') {
+                                    setSelectedChapter('');
+                                }
+                            }}
+                            onBlur={e => {
+                                if (!selectedChapter || Number(selectedChapter) < 1) {
+                                    setSelectedChapter(1);
+                                }
+                            }}
+                            className="w-10 text-center bg-transparent outline-none text-sm font-semibold hover:text-slate-800 transition-colors border-b border-transparent hover:border-slate-300 focus:border-slate-400 appearance-none m-0"
+                            style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
+                            title="Capítulo"
+                        />
+                    </div>
 
                     <button
-                        onClick={() => setSelectedChapter(selectedChapter + 1)}
+                        onClick={() => setSelectedChapter(Number(selectedChapter) + 1)}
                         className="p-1 hover:text-slate-800 transition-colors"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>

@@ -98,6 +98,7 @@ const html = [
     "<!doctype html>",
     "<html>",
     "<head>",
+    "  <title>Bible Canvas</title>",
     cssBlock,
     jsBlock,
     "</head>",

@@ -1,7 +1,7 @@
 {
-  "name": "electron-react-ts-starter",
+  "name": "bible-canvas",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bible Canvas",
   "type": "module",
   "main": "dist/electron-app/main.js",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

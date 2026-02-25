@@ -8,8 +8,11 @@ const __dirname = path.dirname(__filename);
 let db = null;
 const createWindow = () => {
     const win = new BrowserWindow({
+        title: 'Bible Canvas',
+        icon: path.join(app.getAppPath(), 'book.png'),
         width: 800,
         height: 600,
+        show: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
@@ -17,6 +20,8 @@ const createWindow = () => {
             sandbox: true
         }
     });
+    win.maximize();
+    win.show();
     win.loadFile('dist/index.html');
 };
 /**
