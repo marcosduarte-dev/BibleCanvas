@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "outDir": "./dist/electron-app",
+        "rootDir": "./src/electron-app",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "noEmit": false
+    },
+    "include": [
+        "src/electron-app"
+    ],
+    "exclude": [
+        "node_modules",
+        "src/electron-app/preload.ts"
+    ]
+}
