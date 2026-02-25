@@ -6,9 +6,11 @@
   "main": "dist/electron-app/main.js",
   "scripts": {
     "dev": "vite",
-    "start": "npm run build:react && npm run build:electron && electron .",
+    "start": "npm run build && electron .",
     "build:react": "tsx ./build.mts",
-    "build:electron": "tsc --project tsconfig.preload.json && tsc --project tsconfig.electron.json"
+    "build:electron": "tsc --project tsconfig.preload.json && tsc --project tsconfig.electron.json",
+    "build": "npm run build:react && npm run build:electron",
+    "package": "npm run build && electron-builder"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +21,26 @@
     "sql.js": "^1.8.0",
     "tldraw": "^4.4.0"
   },
+  "build": {
+    "appId": "com.marcosduarte.biblecanvas",
+    "productName": "Bible Canvas",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "book.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ]
+  },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "@types/node": "^24.9.2",
@@ -28,6 +50,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
     "electron": "^39.0.0",
+    "electron-builder": "^26.8.1",
     "fast-glob": "^3.3.3",
     "globals": "^16.4.0",
     "postcss": "^8.5.6",

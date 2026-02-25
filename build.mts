@@ -71,27 +71,21 @@ console.log(`Built ${builtName}`)
 
 const htmlPath = path.join(outDir, htmlName)
 
-// css get renamed sometimes
-const cssPaths = fg.sync(`${outDir}/**/*.css`)
-const jsPaths = fg.sync(`${outDir}/**/*.js`)
+// Collect output CSS and JS files as external references (NOT inlined)
+// Inlining minified JS into HTML breaks regex patterns due to HTML parser interference
+const cssPaths = fg.sync(`${outDir}/*.css`)
+const jsPaths = fg.sync(`${outDir}/*.js`)
 
-let cssBlock: string = ""
-
+let cssLinks = ""
 for (const cssPath of cssPaths) {
-    const css = fs.existsSync(cssPath)
-        ? fs.readFileSync(cssPath, { encoding: "utf8" })
-        : ""
-    cssBlock = cssBlock + css ? `\n  <style>\n${css}\n  </style>\n` : ""
-    fs.rmSync(cssPath)
+    const fileName = path.basename(cssPath)
+    cssLinks += `  <link rel="stylesheet" href="./${fileName}">\n`
 }
 
-let jsBlock: string = ""
+let jsScripts = ""
 for (const jsPath of jsPaths) {
-    const js = fs.existsSync(jsPath)
-        ? fs.readFileSync(jsPath, { encoding: "utf8" })
-        : ""
-    jsBlock = jsBlock + js ? `\n  <script type="module">\n${js}\n  </script>` : ""
-    fs.rmSync(jsPath)
+    const fileName = path.basename(jsPath)
+    jsScripts += `  <script type="module" src="./${fileName}"></script>\n`
 }
 
 const html = [
@@ -99,16 +93,15 @@ const html = [
     "<html>",
     "<head>",
     "  <title>Bible Canvas</title>",
-    cssBlock,
-    jsBlock,
+    cssLinks,
     "</head>",
     "<body>",
     `  <div id="${htmlRootName}"></div>`,
+    jsScripts,
     "</body>",
     "</html>",
 ].join("\n")
 
 fs.writeFileSync(htmlPath, html, { encoding: "utf8" })
-
 
 console.log(`${htmlPath} (generated)`)
